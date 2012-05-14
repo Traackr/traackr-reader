@@ -1,0 +1,45 @@
+/*
+ * CSS for jQuery.reader inline reader
+ */
+
+.inline_reader_style.ui-dialog {
+    padding: 0px;
+ }
+
+.inline_reader_style .ui-dialog-titlebar {
+    background: none repeat scroll 0 0 black;
+    color: white;
+}
+.inline_reader_style .ui-dialog-titlebar-close {
+   display: none;
+}
+
+.inline_reader_style .reader_nav {
+   cursor: pointer;
+   font-size: 12px;
+   font-weight: normal;
+}
+
+.inline_reader_style .reader_nav_link {
+   position: absolute;
+   left: 120px;
+   top: 10px;
+   overflow: hidden;
+   white-space: nowrap;
+   width: 80%;
+}
+
+.inline_reader_style .reader_nav_close {
+   position: absolute;
+   right: 10px;
+   top: 12px;
+}
+
+.inline_reader_style .ui-dialog-titlebar a:link,
+.inline_reader_style .ui-dialog-titlebar a:visited,
+.inline_reader_style .ui-dialog-titlebar a:hover,
+.inline_reader_style .ui-dialog-titlebar a:active {
+   color: white;
+   text-decoration: none;
+
+}

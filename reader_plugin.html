@@ -1,0 +1,68 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+
+   <head>
+      <title>Traackr Reader</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <script type="text/javascript"
+              src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+      </script>
+      <script type="text/javascript"
+              src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js">
+      </script>
+      <script type="text/javascript"
+              src="src/jquery.reader.js">
+      </script>
+      <link rel="stylesheet" type="text/css"
+            href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/smoothness/jquery-ui.css"/>
+      <link rel="stylesheet" type="text/css"
+            href="css/jquery.reader.css"/>
+
+      <script type="text/javascript">
+         $(document).ready(function() {
+            reader = $('.readeable_link').reader();
+            $(".start_read").click(function() {
+               reader.open();
+            });
+         });
+
+      </script>
+
+   </head>
+
+   <body>
+      <div>
+         <h1>My Content</h1>
+         <div>
+            <ul>
+
+               <li><a href="http://www.boston.com/business/technology/articles/2012/05/13/report_yahoo_ceo_to_step_down_amid_resume_miscue" class="readeable_link">http://boston.com</a></li>
+               <li><a href="http://cnn.com" class="readeable_link">http://cnn.com</a></li>
+               <li><a href="http://washingtonpost.com" class="readeable_link">http://washingtonpost.com</a></li>
+               <li><a href="http://traackr.com" class="readeable_link">http://traackr.com</a></li>
+               <li><a href="http://propz.me" class="readeable_link">http://propz.me</a></li>
+
+               <li><a href="https://twitter.com/dchancogne/status/201534297168031745" class="readeable_link">http://twitter.com/dchancogne</a></li>
+               <li><a href="https://www.facebook.com/BMWBLOG/posts/10150660631497454" class="readeable_link">http://facebook.com/BMW</a></li>
+
+               <!--
+               <li><a href="sample/page1.html" class="readeable_link">Page 1</a></li>
+               <li><a href="sample/page2.html" class="readeable_link">Page 2</a></li>
+               <li><a href="sample/page3.html" class="readeable_link">Page 3</a></li>
+               <li><a href="sample/page4.html" class="readeable_link">Page 4</a></li>
+               <li><a href="sample/page5.html" class="readeable_link">Page 5</a></li>
+               <li><a href="https://twitter.com/dchancogne/status/201534297168031745" class="readeable_link">http://twitter.com/dchancogne</a></li>
+               -->
+
+            </ul>
+         </div>
+         <span class="start_read">Read</span>
+      </div>
+
+   </body>
+
+</html>
