@@ -40,28 +40,25 @@
             var prev_frame = (this.current_frame + ( this.frames_count - 1) ) % this.frames_count;
             var next_frame = (this.current_frame + ( this.frames_count + 1) ) % this.frames_count;
 
+            // Load and show current page
             console.log('Loading '+this.pages[this.current_page]+' in frame '+this.current_frame);
-            $('#'+this.opts.inline_reader+' div#alt_page_'+this.current_frame).html('<i>Loading: '+this.pages[this.current_page]+'</i>');
+            this._load_page_content(this.pages[this.current_page], this.current_frame);
             $('#'+this.opts.inline_reader+' div#alt_page_'+this.current_frame).show();
             $('#'+this.opts.inline_reader+' iframe#page_'+this.current_frame).css("display", "none");
-            $('#'+this.opts.inline_reader+' iframe#page_'+this.current_frame).removeAttr("loaded");
-            $('#'+this.opts.inline_reader+' iframe#page_'+this.current_frame).attr("src", this.pages[this.current_page]);
 
+            // Load previous page, do not show it
             console.log('Loading '+this.pages[prev_page]+' in frame '+prev_frame);
-            $('#'+this.opts.inline_reader+' div#alt_page_'+prev_frame).html('<i>Loading: '+this.pages[prev_page]+'</i>');
+            this._load_page_content(this.pages[prev_page], prev_frame);
             $('#'+this.opts.inline_reader+' div#alt_page_'+prev_frame).hide();
             $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).css("display", "none");
-            $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).removeAttr("loaded");
-            $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).attr("src", this.pages[prev_page]);
 
+            // Load next page, do not show it
             console.log('Loading '+this.pages[next_page]+' in frame '+next_frame);
-            $('#'+this.opts.inline_reader+' div#alt_page_'+next_frame).html('<i>Loading: '+this.pages[next_page]+'</i>');
+            this._load_page_content(this.pages[next_page], next_frame);
             $('#'+this.opts.inline_reader+' div#alt_page_'+next_frame).hide();
             $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).css("display", "none");
-            $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).removeAttr("loaded");
-            $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).attr("src", this.pages[next_page]);
 
-         }, // End function init()
+         }, // End function view_page()
 
          // Shfit page and frame forward or backward based on offset.
          // Offset should be +1/-1
@@ -90,14 +87,13 @@
 
             // Show next frame or next alt page if frame not loaded
             var loaded = $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).attr("loaded");
-            var src = $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).attr("src");
-            if ( loaded && src != '_twitter-status_' && src != '_facebook-status_' ) {
+            var source = $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).attr("source");
+            if ( loaded && source != '_twitter-status_' && source != '_facebook-status_' ) {
                $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).css("display", "block");
             }
             else {
                $('#'+this.opts.inline_reader+' div#alt_page_'+next_frame).show();
             }
-            //console.log($('#'+this.opts.inline_reader+' iframe#page_'+next_frame).document);
 
             // Compute new current page
             this.current_page = (this.current_page + ( this.pages.length + offset) ) % this.pages.length;
@@ -106,7 +102,6 @@
             // Compute new next page
             var next_page = (this.current_page + ( this.pages.length + offset) ) % this.pages.length;
             console.log('Next page after shift: '+next_page);
-
 
             // Update dialog title
             //console.log('Updating dialog to page URL: '+this.pages[this.current_page]);
@@ -123,33 +118,42 @@
 
             $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).css("display", "none");
             var p = this.pages[next_page];
-            var markup = '';
-            if ( /twitter.com.+status.+/.test(p) ) {
-               markup = '<blockquote class="twitter-tweet">' +
-                  '<p>&nbsp;</p>' +
-                  '<a href="'+p+'"></a>' +
-                  '</blockquote>' +
-                  '<script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
-               $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).removeAttr("loaded");
-               $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).attr("src", "_twitter-status_");
-            }
-            else if ( /facebook.com/.test(p) ) {
-               markup = '<b>Facebook content can not be loaded here. Click link to read.</b><br/><br/>' +
-                  '<a target="_blank" href="'+p+'">'+p+'</a>';
-               $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).removeAttr("loaded");
-               $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).attr("src", "_facebook-status_");
-            }
-            else {
-               markup = '<i>Loading: '+p+'</i>';
-               $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).removeAttr("loaded");
-               $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).attr("src", this.pages[next_page]);
-            }
-            $('#'+this.opts.inline_reader+' div#alt_page_'+prev_frame).html(markup);
-            //$('#'+this.opts.inline_reader+' div#alt_page_'+prev_frame).show();
+            this._load_page_content(p, prev_frame);
 
             // Shift frame
             this.current_frame = next_frame;
          }, // End function _shift()
+
+         _load_page_content: function(url, frame_index) {
+            var markup = '';
+            if ( /twitter.com.+status.+/.test(url) ) {
+               markup = '<div style="margin-left: auto; margin-right: auto;">' +
+                  '<blockquote class="twitter-tweet">' +
+                  '<p>&nbsp;</p>' +
+                  '<a href="'+url+'"></a>' +
+                  '</blockquote>' +
+                  '</div>' +
+                  '<script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
+               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).removeAttr("loaded");
+               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("src", "javascript:void(0);");
+               //$('#'+this.opts.inline_reader+' iframe#page_'+frame_index).removeAttr("src");
+               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("source", "_twitter-status_");
+            }
+//            else if ( /facebook.com/.test(url) ) {
+//               markup = '<b>Facebook content can not be loaded here. Click link to read.</b><br/><br/>' +
+//                  '<a target="_blank" href="'+url+'">'+url+'</a>';
+//               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).removeAttr("loaded");
+//               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("src", "");
+//               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("source", "_facebook-status_");
+//            }
+            else {
+               markup = '<span class="content_loading">Loading: '+url+'</span>';
+               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).removeAttr("loaded");
+               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("src", url);
+               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("source", "url");
+            }
+            $('#'+this.opts.inline_reader+' div#alt_page_'+frame_index).html(markup);
+         }, // End function _load_page_content
 
          // Go to the next page loaded
          next: function() { this._shift(+1); }, // End function next()
@@ -183,8 +187,11 @@
             $('#'+this.opts.inline_reader+' iframe#page_'+index).attr("loaded", "loaded");
             if ( this.current_frame ==  index ) {
                console.log('Frame loaded is current frame');
-               $('#'+this.opts.inline_reader+' div#alt_page_'+index).hide();
-               $('#'+this.opts.inline_reader+' iframe#page_'+index).css("display", "block");
+               var source = $('#'+this.opts.inline_reader+' iframe#page_'+source).attr("source");
+               if ( source != '_twitter-status_' && source != '_facebook-status_' ) {
+                  $('#'+this.opts.inline_reader+' div#alt_page_'+index).hide();
+                  $('#'+this.opts.inline_reader+' iframe#page_'+index).css("display", "block");
+               }
             }
          } // End function content_loaded()
 
@@ -206,10 +213,12 @@
          '   <div id="alt_page_2" class="alt_page" style="display: none; width: 100%;  padding: 20px;"></div>' +
       '</div>';
       var title_nav =
+         '<span class="reader_header">' +
          '<span class="reader_nav" onclick="jQuery.reader.prev();">prev</span> | ' +
          '<span class="reader_nav" onclick="jQuery.reader.next();">next</span> | ' +
          '<div class="reader_nav_link"></div>' +
-         '<span class="reader_nav reader_nav_close" onclick="jQuery(\'#'+opts.inline_reader+'\').dialog(\'close\');">close</span>';
+         '<span class="reader_nav reader_nav_close" onclick="jQuery(\'#'+opts.inline_reader+'\').dialog(\'close\');">close</span>' +
+         '</span>';
 
       function _init() {
          console.log('_init()');
@@ -235,8 +244,6 @@
             resizable: false
          });
 
-//         $('#'+opts.inline_reader).parents('.ui-dialog').addClass('inline_reader_style');
-
          console.log('_init() done.');
 
       }; // End function _init()
@@ -257,23 +264,21 @@
             console.log('Pages loaded: '+reader.pages);
             console.log('Looking for index for: '+$(this).attr('href'));
             console.log('Index: '+reader.pages.indexOf($(this).attr('href')));
-            reader.view_page(reader.pages.indexOf($(this).attr('href')));
-//            reader.current_page = reader.pages.indexOf($(this).attr('href'));
-//            $('#'+opts.inline_reader+' iframe#page_'+reader.current_frame+' body').html('');
-//            $('#'+opts.inline_reader+' iframe#page_'+reader.current_frame).attr("src", reader.pages[reader.current_page]);
+            var page_index = reader.pages.indexOf($(this).attr('href'));
+            if ( parseInt(page_index) != parseInt(reader.current_page) ) {
+               console.log('===> Need to reset page viewed');
+               reader.view_page(page_index);
+            }
             reader.open();
+            // Prevent link from opening
             return false;
          });
 
       }); // End plugin return execution
 
-      // Load first 3 pages
-      console.log('Loading the first 3 pages');
+      // Load first page, this 3 pages
+      console.log('Loading initial page');
       reader.view_page(0);
-//      for ( i = reader.current_page; i < 3; i++ ) {
-//         console.log('Loading '+reader.pages[i]+' in frame '+i);
-//         $('#'+opts.inline_reader+' iframe#page_'+i).attr("src", reader.pages[i]);
-//      }
 
       // Create static access to reader object
       $.reader = reader;
