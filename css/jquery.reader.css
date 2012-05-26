@@ -7,11 +7,28 @@
  }
 
 .inline_reader_style .ui-dialog-titlebar {
-    background: none repeat scroll 0 0 black;
-    color: white;
+   background: none repeat scroll 0 0 black;
+   color: white;
+   margin: 0px;
+   padding: 7px;
+   height: 35px;
+
 }
+
 .inline_reader_style .ui-dialog-titlebar-close {
    display: none;
+}
+
+.inline_reader_style .reader_header {
+   font-family: Verdana,Arial,sans-serif;
+   font-size: 16px;
+   font-weight: normal;
+   text-transform: lowercase;
+   position: absolute;
+   left: 10px;
+   top: 12px;
+   width: 100%;
+   margin: 0px;
 }
 
 .inline_reader_style .reader_nav {
@@ -22,17 +39,26 @@
 
 .inline_reader_style .reader_nav_link {
    position: absolute;
-   left: 120px;
-   top: 10px;
+   left: 100px;
+   top: 3px;
    overflow: hidden;
    white-space: nowrap;
-   width: 80%;
+   width: 85%;
+   font-weight: bold;
 }
 
 .inline_reader_style .reader_nav_close {
    position: absolute;
-   right: 10px;
-   top: 12px;
+   top: 5px;
+   right: 15px;
+   font-size: 12px;
+}
+
+.inline_reader_style .content_loading {
+   margin-left: auto;
+   margin-right: auto;
+   font-size: 12px;
+   font-style: italic;
 }
 
 .inline_reader_style .ui-dialog-titlebar a:link,
