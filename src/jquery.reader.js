@@ -136,7 +136,6 @@
                   '<script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
                $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).removeAttr("loaded");
                $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("src", "javascript:void(0);");
-               //$('#'+this.opts.inline_reader+' iframe#page_'+frame_index).removeAttr("src");
                $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("source", "_twitter-status_");
             }
 //            else if ( /facebook.com/.test(url) ) {
@@ -266,7 +265,6 @@
             console.log('Index: '+reader.pages.indexOf($(this).attr('href')));
             var page_index = reader.pages.indexOf($(this).attr('href'));
             if ( parseInt(page_index) != parseInt(reader.current_page) ) {
-               console.log('===> Need to reset page viewed');
                reader.view_page(page_index);
             }
             reader.open();
