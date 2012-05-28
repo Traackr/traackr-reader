@@ -4,6 +4,10 @@
 
 (function($) {
 
+   // Delete any existing reader when executing plugin.
+   $.reader = {};
+
+   // Plugin defined as a JQuery function
    $.fn.reader = function(options) {
 
       // Merge options passed with settings
@@ -16,12 +20,18 @@
          window.console.log = function (text) { };
       }
 
+      // Reader object does all the heavy lifting.
       var reader = {
 
+         // All pages available to the reader
          pages: [],
+         // Fames used to pre-load content: current, 1 prev, 1 next
          frames_count: 3,
+         // Current pages index
          current_page: 0,
+         // Current frame index
          current_frame: 0,
+         // Plugin options
          opts: opts,
 
          // Init current page and current frame based on page index to view.
@@ -219,6 +229,8 @@
          '<span class="reader_nav reader_nav_close" onclick="jQuery(\'#'+opts.inline_reader+'\').dialog(\'close\');">close</span>' +
          '</span>';
 
+
+      // Initialization function
       function _init() {
          console.log('_init()');
 
@@ -286,7 +298,6 @@
 
    }; // End $.fn.reader()
 
-   $.reader = {};
 
    // Default setting
    $.fn.reader.settings = {
