@@ -27,8 +27,9 @@
          pages: [],
          // Fames used to pre-load content: current, 1 prev, 1 next
          frames_count: 3,
-         // Current pages index
-         current_page: 0,
+         // Current pages index. Set to -1 so call to view_page(0) is init
+         // function still loads first page
+         current_page: -1,
          // Current frame index
          current_frame: 0,
          // Plugin options
@@ -39,6 +40,13 @@
          // them on the appropriate frame
          // TODO: Enable init via a page URL
          view_page: function(index) {
+
+            // If page reuqested to view is current page, nothing to do.
+            if ( parseInt(index) == parseInt(this.current_page) ) {
+               console.log('Page requested is current page. Nothing to do.');
+               return;
+            }
+
             // Init current page and current frame
             this.current_page = index;
             this.current_frame = 0;
@@ -74,7 +82,9 @@
          // Offset should be +1/-1
          // Other values (+n/-n) might work but have not been tested
          // In the context of this function 'next' means next in the direction
-         // we are going, either forward or backward
+         // we are going, either forward or backward.
+         // In this function 'new' referes to pages/frames after the shift and
+         // 'old' referes to pages/frames before the shift.
          _shift: function(offset) {
 
             console.log('_shift()');
@@ -87,51 +97,53 @@
             console.log('Hiding all alt pages');
             $('.alt_page').hide();
 
-            // Find next frame to show - Should have been already loaded
-            var next_frame = (this.current_frame + (this.frames_count + offset) ) % this.frames_count;
-            console.log('Next frame: '+next_frame);
+            // Find next frame. The "new current" frame.
+            // This is the one to show. Should ben already loaded
+            var new_current_frame = (this.current_frame + (this.frames_count + offset) ) % this.frames_count;
+            console.log('Next frame: '+new_current_frame);
 
             // Hide current frame
             console.log('Hidding current frame: '+this.current_frame);
             $('#'+this.opts.inline_reader+' iframe#page_'+this.current_frame).css("display", "none");
 
             // Show next frame or next alt page if frame not loaded
-            var loaded = $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).attr("loaded");
-            var source = $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).attr("source");
+            var loaded = $('#'+this.opts.inline_reader+' iframe#page_'+new_current_frame).attr("loaded");
+            var source = $('#'+this.opts.inline_reader+' iframe#page_'+new_current_frame).attr("source");
             if ( loaded && source != '_twitter-status_' && source != '_facebook-status_' ) {
-               $('#'+this.opts.inline_reader+' iframe#page_'+next_frame).css("display", "block");
+               $('#'+this.opts.inline_reader+' iframe#page_'+new_current_frame).css("display", "block");
             }
             else {
-               $('#'+this.opts.inline_reader+' div#alt_page_'+next_frame).show();
+               $('#'+this.opts.inline_reader+' div#alt_page_'+new_current_frame).show();
             }
 
             // Compute new current page
-            this.current_page = (this.current_page + ( this.pages.length + offset) ) % this.pages.length;
-            console.log('Current page after shift: '+this.current_page);
-            console.log('Current URL after shift: '+this.pages[this.current_page]);
+            var new_current_page = (this.current_page + ( this.pages.length + offset) ) % this.pages.length;
+            console.log('Current page after shift (new): '+new_current_page);
+            console.log('Current URL after shift (new): '+this.pages[new_current_page]);
             // Compute new next page
-            var next_page = (this.current_page + ( this.pages.length + offset) ) % this.pages.length;
-            console.log('Next page after shift: '+next_page);
+            var new_next_page = (new_current_page + ( this.pages.length + offset) ) % this.pages.length;
+            console.log('Next page after shift: '+new_next_page);
 
             // Update dialog title
-            //console.log('Updating dialog to page URL: '+this.pages[this.current_page]);
             var page_url_link = '<a target="_blank" href="' +
-                  this.pages[this.current_page] + '">' + this.pages[this.current_page] + '</a>';
+                  this.pages[new_current_page] + '">' + this.pages[new_current_page] + '</a>';
             $('.reader_nav_link').html(page_url_link);
 
             // Old previous frame needs to become the future next frame - Load its content
-            var prev_frame = (this.current_frame + ( this.frames_count - offset) ) % this.frames_count;
-            console.log('Updating frame: '+prev_frame);
+            var old_prev_frame = (this.current_frame + ( this.frames_count - offset) ) % this.frames_count;
+            console.log('Updating frame: '+old_prev_frame);
             // Setting loading content and showing alt page for next frame
-            console.log('Updating alt page: '+prev_frame);
-            console.log('Loading URL: '+this.pages[next_page]);
+            console.log('Updating alt page: '+old_prev_frame);
+            console.log('Loading URL: '+this.pages[new_next_page]);
 
-            $('#'+this.opts.inline_reader+' iframe#page_'+prev_frame).css("display", "none");
-            var p = this.pages[next_page];
-            this._load_page_content(p, prev_frame);
+            $('#'+this.opts.inline_reader+' iframe#page_'+old_prev_frame).css("display", "none");
+            var p = this.pages[new_next_page];
+            this._load_page_content(p, old_prev_frame);
 
-            // Shift frame
-            this.current_frame = next_frame;
+            // Shift frame & page
+            this.current_page  = new_current_page;
+            this.current_frame = new_current_frame;
+
          }, // End function _shift()
 
          _load_page_content: function(url, frame_index) {
@@ -145,7 +157,7 @@
                   '</div>' +
                   '<script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
                $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).removeAttr("loaded");
-               $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("src", "javascript:void(0);");
+               //$('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("src", "javascript:void(0);");
                $('#'+this.opts.inline_reader+' iframe#page_'+frame_index).attr("source", "_twitter-status_");
             }
 //            else if ( /facebook.com/.test(url) ) {
@@ -276,9 +288,7 @@
             console.log('Looking for index for: '+$(this).attr('href'));
             console.log('Index: '+reader.pages.indexOf($(this).attr('href')));
             var page_index = reader.pages.indexOf($(this).attr('href'));
-            if ( parseInt(page_index) != parseInt(reader.current_page) ) {
-               reader.view_page(page_index);
-            }
+            reader.view_page(page_index);
             reader.open();
             // Prevent link from opening
             return false;
